@@ -705,6 +705,11 @@ export class SyncAgent {
             };
           });
           result.options.push(...defaultOptions);
+          // Add smart-tags to the options
+          result.options.push({
+            label: "Smart Tags",
+            value: "$smartTags",
+          });
         } else {
           const defaultOptions = SELLSY_DEFAULTFIELDS_CONTACT.filter((sf) => {
             return sf.readonly === false;

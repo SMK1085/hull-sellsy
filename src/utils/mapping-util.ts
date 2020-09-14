@@ -427,7 +427,7 @@ export class MappingUtil {
           }
         } else if (mapping.service === "$smartTags" && data.smartTags) {
           const smartTags: string[] = [];
-          forIn(data.smartTags, (v, k) => {
+          forIn(data.tags, (v, k) => {
             smartTags.push(v.word);
           });
           set(result, mapping.hull.replace("traits_", ""), smartTags);

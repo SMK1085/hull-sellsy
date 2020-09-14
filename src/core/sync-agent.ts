@@ -249,11 +249,11 @@ export class SyncAgent {
     const customFieldsList: SellsyCustomField[] = [];
     forIn(customFields, (v, k) => {
       if (objectType === "clients") {
-        if (v.useOn_client === "Y") {
+        if (v.useOn_client === "Y" || v.useOn_people === "Y") {
           customFieldsList.push(v);
         }
       } else if (objectType === "prospects") {
-        if (v.useOn_prospect === "Y") {
+        if (v.useOn_prospect === "Y" || v.useOn_people === "Y") {
           customFieldsList.push(v);
         }
       } else if (objectType === "contacts") {

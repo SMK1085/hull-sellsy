@@ -316,6 +316,20 @@ export class MappingUtil {
       }
     });
 
+    // Set the TLA name if not empty string
+    if (data.fullName !== "") {
+      set(result, "name", {
+        value: data.fullName,
+        operation: "setIfNull",
+      });
+    }
+
+    // Set the Sellsy ID attribute
+    set(result, "sellsy/id", {
+      value: data.id,
+      operation: "setIfNull",
+    });
+
     return result;
   }
 
@@ -360,6 +374,28 @@ export class MappingUtil {
           }
         }
       }
+    });
+
+    // Set the TLA first_name
+    if (data.people_forename !== "") {
+      set(result, "first_name", {
+        value: data.people_forename,
+        operation: "setIfNull",
+      });
+    }
+
+    // Set the TLA lat_name
+    if (data.people_name !== "") {
+      set(result, "last_name", {
+        value: data.people_name,
+        operation: "setIfNull",
+      });
+    }
+
+    // Set the Sellsy ID attribute
+    set(result, "sellsy/id", {
+      value: data.id,
+      operation: "setIfNull",
     });
 
     return result;

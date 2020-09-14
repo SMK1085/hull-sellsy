@@ -378,7 +378,7 @@ export class MappingUtil {
           data.customfields
         ) {
           const customField = data.customfields.find(
-            (cf) =>
+            (cf: SellsyFieldDefinition) =>
               cf.code ===
               (mapping.service as string).replace("$customfield.", ""),
           );

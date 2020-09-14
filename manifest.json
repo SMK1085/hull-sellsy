@@ -1,0 +1,552 @@
+{
+  "name": "Sellsy [BETA]",
+  "tags": [
+    "outgoing",
+    "oneColumn",
+    "batch",
+    "batch-accounts",
+    "smart-notifier"
+  ],
+  "description": "Hull Connector for Sellsy",
+  "readme": "readme.md",
+  "tabs": [],
+  "version": "1.0.0",
+  "source": "sellsy",
+  "logo": "logo.png",
+  "picture": "picture.png",
+  "ui": false,
+  "settings": [],
+  "private_settings": [{
+      "name": "auth_consumer_token",
+      "type": "string",
+      "title": "Consumer Token",
+      "description": "The Consumer Token. Obtain it from [https://www.sellsy.fr/developer/my-apps](https://www.sellsy.fr/developer/my-apps)"
+    },
+    {
+      "name": "auth_consumer_secret",
+      "type": "string",
+      "title": "Consumer Secret",
+      "description": "The Consumer Secret. Obtain it from [https://www.sellsy.fr/developer/my-apps](https://www.sellsy.fr/developer/my-apps)"
+    },
+    {
+      "name": "auth_user_token",
+      "type": "string",
+      "title": "User Token",
+      "description": "The User Token. Obtain it from [https://www.sellsy.fr/developer/my-apps](https://www.sellsy.fr/developer/my-apps)"
+    },
+    {
+      "name": "auth_user_secret",
+      "type": "string",
+      "title": "User Secret",
+      "description": "The User Secret. Obtain it from [https://www.sellsy.fr/developer/my-apps](https://www.sellsy.fr/developer/my-apps)"
+    },
+    {
+      "name": "identity_in_corporation",
+      "title": "Incoming Corporation",
+      "description": "Customize how clients and prospects of type corporation are resolved from and to Hull accounts.",
+      "type": "array",
+      "format": "table",
+      "items": {
+        "type": "object",
+        "properties": {
+          "service": {
+            "title": "Sellsy Identifier",
+            "type": "string",
+            "format": "select",
+            "options": {
+              "allowCreate": false,
+              "loadOptions": "/meta/identity/corporation/incoming"
+            }
+          },
+          "hull": {
+            "title": "Hull Identifier",
+            "enum": [
+              "external_id",
+              "domain"
+            ]
+          },
+          "required": {
+            "type": "boolean",
+            "title": "required?",
+            "format": "select"
+          }
+        }
+      },
+      "default": [{
+        "hull": "domain",
+        "service": "webUrl",
+        "required": false
+      }]
+    },
+    {
+      "name": "identity_in_person",
+      "title": "Incoming Person",
+      "description": "Customize how clients and prospects of type person are resolved from and to Hull users.",
+      "type": "array",
+      "format": "table",
+      "items": {
+        "type": "object",
+        "properties": {
+          "service": {
+            "title": "Sellsy Identifier",
+            "type": "string",
+            "format": "select",
+            "options": {
+              "allowCreate": false,
+              "loadOptions": "/meta/identity/person/incoming"
+            }
+          },
+          "hull": {
+            "title": "Hull Identifier",
+            "enum": [
+              "external_id",
+              "email"
+            ]
+          },
+          "required": {
+            "type": "boolean",
+            "title": "required?",
+            "format": "select"
+          }
+        }
+      },
+      "default": [{
+        "hull": "email",
+        "service": "email",
+        "required": false
+      }]
+    },
+    {
+      "name": "identity_in_contact",
+      "title": "Incoming Contact",
+      "description": "Customize how contacts are resolved from and to Hull users.",
+      "type": "array",
+      "format": "table",
+      "items": {
+        "type": "object",
+        "properties": {
+          "service": {
+            "title": "Sellsy Identifier",
+            "type": "string",
+            "format": "select",
+            "options": {
+              "allowCreate": false,
+              "loadOptions": "/meta/identity/contact/incoming"
+            }
+          },
+          "hull": {
+            "title": "Hull Identifier",
+            "enum": [
+              "external_id",
+              "email"
+            ]
+          },
+          "required": {
+            "type": "boolean",
+            "title": "required?",
+            "format": "select"
+          }
+        }
+      },
+      "default": [{
+        "hull": "email",
+        "service": "email",
+        "required": false
+      }]
+    },
+    {
+      "name": "mapping_in_client_account",
+      "type": "array",
+      "title": "Incoming Attributes",
+      "format": "accountTraitMapping",
+      "options": {
+        "direction": "incoming",
+        "showOverwriteToggle": false,
+        "placeholder": "Sellsy Field",
+        "allowCreate": true,
+        "loadOptions": "/meta/fields/client/incoming",
+        "source": "sellsy"
+      },
+      "default": [{
+          "hull": "sellsy/website",
+          "service": "web"
+        },
+        {
+          "hull": "sellsy/name",
+          "service": "fullName"
+        }
+      ]
+    },
+    {
+      "name": "account_client_synchronized_segments",
+      "title": "Account Filter",
+      "description": "Send Hull Accounts as clients of type corporation when they are part of one of these segments.",
+      "type": "array",
+      "format": "accountSegment",
+      "default": []
+    },
+    {
+      "name": "mapping_out_client_account",
+      "type": "array",
+      "title": "Outgoing Attributes",
+      "format": "accountTraitMapping",
+      "options": {
+        "direction": "outgoing",
+        "showOverwriteToggle": false,
+        "placeholder": "Sellsy Field",
+        "allowCreate": false,
+        "loadOptions": "/meta/fields/client/outgoing"
+      },
+      "default": []
+    },
+    {
+      "name": "mapping_in_client_person",
+      "type": "array",
+      "title": "Incoming Attributes",
+      "format": "traitMapping",
+      "options": {
+        "direction": "incoming",
+        "showOverwriteToggle": false,
+        "placeholder": "Sellsy Field",
+        "allowCreate": true,
+        "loadOptions": "/meta/fields/client/incoming",
+        "source": "sellsy"
+      },
+      "default": [{
+          "hull": "sellsy/email",
+          "service": "email"
+        },
+        {
+          "hull": "sellsy/first_name",
+          "service": "people_forename"
+        },
+        {
+          "hull": "sellsy/last_name",
+          "service": "people_name"
+        }
+      ]
+    },
+    {
+      "name": "user_client_synchronized_segments",
+      "title": "User Filter",
+      "description": "Send Hull User as clients of type person when they are part of one of these segments.",
+      "type": "array",
+      "format": "segment",
+      "default": []
+    },
+    {
+      "name": "mapping_out_client_person",
+      "type": "array",
+      "title": "Outgoing Attributes",
+      "format": "traitMapping",
+      "options": {
+        "direction": "outgoing",
+        "showOverwriteToggle": false,
+        "placeholder": "Sellsy Field",
+        "allowCreate": false,
+        "loadOptions": "/meta/fields/client/outgoing"
+      },
+      "default": []
+    },
+    {
+      "name": "mapping_in_prospect_account",
+      "type": "array",
+      "title": "Incoming Attributes",
+      "format": "accountTraitMapping",
+      "options": {
+        "direction": "incoming",
+        "showOverwriteToggle": false,
+        "placeholder": "Sellsy Field",
+        "allowCreate": true,
+        "loadOptions": "/meta/fields/prospect/incoming",
+        "source": "sellsy"
+      },
+      "default": [{
+          "hull": "sellsy/website",
+          "service": "web"
+        },
+        {
+          "hull": "sellsy/name",
+          "service": "fullName"
+        }
+      ]
+    },
+    {
+      "name": "account_prospect_synchronized_segments",
+      "title": "Account Filter",
+      "description": "Send Hull Accounts as prospects of type corporation when they are part of one of these segments.",
+      "type": "array",
+      "format": "accountSegment",
+      "default": []
+    },
+    {
+      "name": "mapping_out_client_account",
+      "type": "array",
+      "title": "Outgoing Attributes",
+      "format": "accountTraitMapping",
+      "options": {
+        "direction": "outgoing",
+        "showOverwriteToggle": false,
+        "placeholder": "Sellsy Field",
+        "allowCreate": false,
+        "loadOptions": "/meta/fields/prospect/outgoing"
+      },
+      "default": []
+    },
+    {
+      "name": "mapping_in_prospect_person",
+      "type": "array",
+      "title": "Incoming Attributes",
+      "format": "traitMapping",
+      "options": {
+        "direction": "incoming",
+        "showOverwriteToggle": false,
+        "placeholder": "Sellsy Field",
+        "allowCreate": true,
+        "loadOptions": "/meta/fields/prospect/incoming",
+        "source": "sellsy"
+      },
+      "default": [{
+          "hull": "sellsy/email",
+          "service": "email"
+        },
+        {
+          "hull": "sellsy/first_name",
+          "service": "people_forename"
+        },
+        {
+          "hull": "sellsy/last_name",
+          "service": "people_name"
+        }
+      ]
+    },
+    {
+      "name": "user_prospect_synchronized_segments",
+      "title": "User Filter",
+      "description": "Send Hull User as prospects of type person when they are part of one of these segments.",
+      "type": "array",
+      "format": "segment",
+      "default": []
+    },
+    {
+      "name": "mapping_out_prospect_person",
+      "type": "array",
+      "title": "Outgoing Attributes",
+      "format": "traitMapping",
+      "options": {
+        "direction": "outgoing",
+        "showOverwriteToggle": false,
+        "placeholder": "Sellsy Field",
+        "allowCreate": false,
+        "loadOptions": "/meta/fields/prospect/outgoing"
+      },
+      "default": []
+    },
+    {
+      "name": "mapping_in_contact",
+      "type": "array",
+      "title": "Incoming Attributes",
+      "format": "traitMapping",
+      "options": {
+        "direction": "incoming",
+        "showOverwriteToggle": false,
+        "placeholder": "Sellsy Field",
+        "allowCreate": true,
+        "loadOptions": "/meta/fields/contact/incoming",
+        "source": "sellsy_contact"
+      },
+      "default": [{
+          "hull": "sellsy_contact/email",
+          "service": "email"
+        },
+        {
+          "hull": "sellsy_contact/first_name",
+          "service": "forename"
+        },
+        {
+          "hull": "sellsy_contact/last_name",
+          "service": "name"
+        }
+      ]
+    },
+    {
+      "name": "user_contact_synchronized_segments",
+      "title": "User Filter",
+      "description": "Send Hull User as contacts when they are part of one of these segments.",
+      "type": "array",
+      "format": "segment",
+      "default": []
+    },
+    {
+      "name": "mapping_out_contact",
+      "type": "array",
+      "title": "Outgoing Attributes",
+      "format": "traitMapping",
+      "options": {
+        "direction": "outgoing",
+        "showOverwriteToggle": false,
+        "placeholder": "Sellsy Field",
+        "allowCreate": false,
+        "loadOptions": "/meta/fields/contact/outgoing"
+      },
+      "default": []
+    }
+  ],
+  "json": [{
+      "url": "/webhookurl",
+      "name": "webhookurl",
+      "format": "credentials",
+      "title": "Webhook URL",
+      "description": "Set your external service to send POST webhooks to this url",
+      "handler": "credentialsHandler",
+      "options": {
+        "cacheContextFetch": false
+      }
+    },
+    {
+      "title": "Fetch All Clients",
+      "name": "fetch_all_clients",
+      "format": "button",
+      "url": "/fetch/clients/full",
+      "handler": "fetchAll",
+      "options": {
+        "fireAndForget": true,
+        "confirm": {
+          "action": "fetch",
+          "text": "You are about to pull all clients from Sellsy into Hull. Please make sure you've configured your identity resolution properly, and that you have the attributes you'd like to fetch configured. Be careful when clicking this multiple times, it can result in long operations. Check out the \"Logs\" tab to track `incoming.account.success` and `incoming.user.success` messages as accounts and users are ingested.",
+          "button": "Start Fetching Clients"
+        }
+      }
+    },
+    {
+      "title": "Fetch All Prospects",
+      "name": "fetch_all_prospects",
+      "format": "button",
+      "url": "/fetch/prospects/full",
+      "handler": "fetchAll",
+      "options": {
+        "fireAndForget": true,
+        "confirm": {
+          "action": "fetch",
+          "text": "You are about to pull all prospects from Sellsy into Hull. Please make sure you've configured your identity resolution properly, and that you have the attributes you'd like to fetch configured. Be careful when clicking this multiple times, it can result in long operations. Check out the \"Logs\" tab to track `incoming.account.success` and `incoming.user.success` messages as accounts and users are ingested.",
+          "button": "Start Fetching Prospects"
+        }
+      }
+    },
+    {
+      "title": "Fetch All Contacts",
+      "name": "fetch_all_contacts",
+      "format": "button",
+      "url": "/fetch/contacts/full",
+      "handler": "fetchAll",
+      "options": {
+        "fireAndForget": true,
+        "confirm": {
+          "action": "fetch",
+          "text": "You are about to pull all contacts from Sellsy into Hull. Please make sure you've configured your identity resolution properly, and that you have the attributes you'd like to fetch configured. Be careful when clicking this multiple times, it can result in long operations. Check out the \"Logs\" tab to track `incoming.user.success` messages as users are ingested.",
+          "button": "Start Fetching Contacts"
+        }
+      }
+    }
+  ],
+  "schedules": [{
+      "url": "/status",
+      "type": "interval",
+      "value": "30"
+    }, {
+      "url": "/fetch/contacts/incremental",
+      "type": "interval",
+      "value": "60"
+    },
+    {
+      "url": "/fetch/clients/incremental",
+      "type": "interval",
+      "value": "60"
+    },
+    {
+      "url": "/fetch/prospects/incremental",
+      "type": "interval",
+      "value": "60"
+    }
+  ],
+  "subscriptions": [{
+    "url": "/smart-notifier"
+  }],
+  "settings_sections": [{
+      "title": "Authentication",
+      "description": "Configure the parameters to authorize the Sellsy API.",
+      "properties": [
+        "private_settings.auth_consumer_token",
+        "private_settings.auth_consumer_secret",
+        "private_settings.auth_user_token",
+        "private_settings.auth_user_secret"
+      ]
+    },
+    {
+      "title": "Webhooks",
+      "description": "Configure this url in your Sellsy webhook settings to leverage near real-time updates.",
+      "properties": [
+        "json.webhookurl"
+      ]
+    },
+    {
+      "title": "Identity Resolution",
+      "description": "Customize how the identity resolution is handled for incoming and outgoing data",
+      "properties": [
+        "private_settings.identity_in_corporation",
+        "private_settings.identity_in_person",
+        "private_settings.identity_in_contact"
+      ]
+    },
+    {
+      "title": "Client (Corporation)",
+      "description": "Define how clients of type corporation are synchronized with Hull Accounts.",
+      "properties": [
+        "private_settings.mapping_in_client_account",
+        "private_settings.account_client_synchronized_segments",
+        "private_settings.mapping_out_client_account",
+        "json.fetch_all_clients"
+      ]
+    },
+    {
+      "title": "Client (Person)",
+      "description": "Define how clients of type person are synchronized with Hull Users.",
+      "properties": [
+        "private_settings.mapping_in_client_person",
+        "private_settings.user_client_synchronized_segments",
+        "private_settings.mapping_out_client_person",
+        "json.fetch_all_clients"
+      ]
+    },
+    {
+      "title": "Prospect (Corporation)",
+      "description": "Define how prospects of type corporation are synchronized with Hull Accounts.",
+      "properties": [
+        "private_settings.mapping_in_prospect_account",
+        "private_settings.account_prospect_synchronized_segments",
+        "private_settings.mapping_out_prospect_account",
+        "json.fetch_all_prospects"
+      ]
+    },
+    {
+      "title": "Prospect (Person)",
+      "description": "Define how prospects of type person are synchronized with Hull Users.",
+      "properties": [
+        "private_settings.mapping_in_prospect_person",
+        "private_settings.user_prospect_synchronized_segments",
+        "private_settings.mapping_out_prospect_person",
+        "json.fetch_all_prospects"
+      ]
+    },
+    {
+      "title": "Contact",
+      "description": "Define how contacts are synchronized with Hull Users.",
+      "properties": [
+        "private_settings.mapping_in_contact",
+        "private_settings.user_contact_synchronized_segments",
+        "private_settings.mapping_out_contact",
+        "json.fetch_all_contacts"
+      ]
+    }
+  ]
+}

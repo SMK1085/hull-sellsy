@@ -12,6 +12,7 @@ import {
   SellsyFieldDefinition,
   SellsyClientCustomField,
   SELLSY_DEFAULTFIELDS_CLIENT,
+  SELLSY_DEFAULTFIELDS_CONTACT,
 } from "../core/service-objects";
 import { IHullUserClaims } from "../types/user";
 const ATTRIBUTE_GROUP_PREFIX = "sellsy";
@@ -419,10 +420,13 @@ export class MappingUtil {
               (mapping.service as string).replace("$customfield.", ""),
           );
           if (customField) {
+            const fieldDefCf = this.customFieldDefs?.find(
+              (fd) => fd.code === mapping.service?.replace("$customfield.", ""),
+            );
             set(
               result,
               mapping.hull.replace("traits_", ""),
-              customField.formatted_value,
+              this.castSellsyApiValueCustomToHullValue(customField, fieldDefCf),
             );
           }
         } else if (mapping.service === "$smartTags" && data.smartTags) {
@@ -434,7 +438,14 @@ export class MappingUtil {
         } else {
           const serviceVal = get(data, mapping.service, null);
           if (!isNil(serviceVal)) {
-            set(result, mapping.hull.replace("traits_", ""), serviceVal);
+            const fieldDefDflt = SELLSY_DEFAULTFIELDS_CONTACT.find(
+              (fd) => fd.code === mapping.service,
+            );
+            set(
+              result,
+              mapping.hull.replace("traits_", ""),
+              this.castSellsyApiValueToHullValue(serviceVal, fieldDefDflt),
+            );
           }
         }
       }

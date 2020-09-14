@@ -1658,6 +1658,13 @@ export const SELLSY_DEFAULTFIELDS_CONTACT: SellsyFieldDefinition[] = [
     readonly: true,
     isDefault: true,
   },
+  {
+    code: "actif",
+    label: "Active",
+    type: "boolean",
+    readonly: true,
+    isDefault: true,
+  },
 ];
 
 export interface SellsyWebhookRequest {

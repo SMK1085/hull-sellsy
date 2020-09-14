@@ -639,6 +639,11 @@ export class SyncAgent {
             };
           });
           result.options.push(...defaultOptions);
+          // Add smart-tags to the options
+          result.options.push({
+            label: "Smart Tags",
+            value: "$smartTags",
+          });
         } else {
           const defaultOptions = SELLSY_DEFAULTFIELDS_PROSPECT.filter((sf) => {
             return sf.readonly === false;
@@ -667,6 +672,11 @@ export class SyncAgent {
             };
           });
           result.options.push(...defaultOptions);
+          // Add smart-tags to the options
+          result.options.push({
+            label: "Smart Tags",
+            value: "$smartTags",
+          });
         } else {
           const defaultOptions = SELLSY_DEFAULTFIELDS_CLIENT.filter((sf) => {
             return sf.readonly === false;

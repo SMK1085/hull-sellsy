@@ -739,7 +739,266 @@ export class SyncAgent {
   }
 
   public async handleWebhook(payload: SellsyWebhookRequest): Promise<void> {
+    let page = 0;
+    let maxPages = 1;
+
+    const connectorId = this.diContainer.resolve<string>("hullAppId");
+    const cachingUtil = this.diContainer.resolve<CachingUtil>("cachingUtil");
+    const serviceClient = this.diContainer.resolve<ServiceClient>(
+      "serviceClient",
+    );
+    let customFieldsResponse = await cachingUtil.getCachedApiResponse(
+      `${connectorId}_cfs_p1`,
+      () => serviceClient.getCustomFields({ pagenum: 1, nbperpage: 100 }),
+      5 * 60,
+    );
+    let cfPage = 1;
+    let customFields = {
+      ...customFieldsResponse.data?.response.result,
+    };
+    if (
+      customFieldsResponse.data &&
+      customFieldsResponse.data.response.infos.nbpages > cfPage
+    ) {
+      cfPage += 1;
+      customFieldsResponse = await cachingUtil.getCachedApiResponse(
+        `${connectorId}_cfs_p${cfPage}`,
+        () =>
+          serviceClient.getCustomFields({ pagenum: cfPage, nbperpage: 100 }),
+        5 * 60,
+      );
+      customFields = {
+        ...customFields,
+        ...customFieldsResponse.data?.response.result,
+      };
+    }
+
+    if (typeof payload.notif === "string") {
+      payload.notif = JSON.parse(payload.notif);
+    }
+
+    // Transform the custom fields into a list form
+    const customFieldsList: SellsyCustomField[] = [];
+    forIn(customFields, (v, k) => {
+      if (payload.notif.thirdtype === "client") {
+        if (v.useOn_client === "Y" || v.useOn_people === "Y") {
+          customFieldsList.push(v);
+        }
+      } else if (payload.notif.thirdtype === "prospect") {
+        if (v.useOn_prospect === "Y" || v.useOn_people === "Y") {
+          customFieldsList.push(v);
+        }
+      } else if (
+        payload.notif.thirdtype === "contact" ||
+        payload.notif.relatedtype === "people"
+      ) {
+        if (v.useOn_people === "Y") {
+          customFieldsList.push(v);
+        }
+      }
+    });
+
+    const customFieldDefs: SellsyFieldDefinition[] = customFieldsList.map(
+      (cf) => {
+        return {
+          code: cf.code,
+          isDefault: false,
+          label: cf.name,
+          readonly: false,
+          type: cf.type as SellsyFieldType,
+        };
+      },
+    );
+    const mappingUtil = this.diContainer.resolve<MappingUtil>("mappingUtil");
+    const hullClient = this.diContainer.resolve<IHullClient>("hullClient");
     console.log(payload);
+    const objectType =
+      payload.notif.eventType === "peopleLog"
+        ? payload.notif.relatedtype
+        : payload.notif.thirdtype;
+    switch (objectType) {
+      case "client":
+        if (
+          payload.notif.event === "created" ||
+          payload.notif.event === "updated"
+        ) {
+          const sellsyId = payload.notif.relatedid;
+          const clientDetailsResponse = await serviceClient.getClient(sellsyId);
+          if (clientDetailsResponse.success && clientDetailsResponse.data) {
+            // Remember the detail ain't be what we mapped, so we need to transform it first
+            const hullApiCalls: Promise<unknown>[] = [];
+            const v = MappingUtil.mapClientDetailToClient(
+              clientDetailsResponse.data.response,
+            );
+
+            if (v.type === "corporation") {
+              // Import as account
+              const acctIdent = mappingUtil.mapClientProspectToHullAccountIdentity(
+                v,
+              );
+              const acctAttribs = mappingUtil.mapToHullAttributes(
+                v,
+                "client",
+                undefined,
+                customFieldDefs,
+              );
+              console.log(acctIdent, acctAttribs);
+              hullApiCalls.push(
+                hullClient.asAccount(acctIdent).traits(acctAttribs),
+              );
+              if (v.contacts) {
+                forIn(v.contacts, (contact, contactId) => {
+                  const contactIdentity = mappingUtil.mapContactToHullUserIdentity(
+                    contact,
+                  );
+                  const contactAttribs = mappingUtil.mapToHullAttributes(
+                    contact,
+                    "contact",
+                    v.id,
+                    customFieldDefs,
+                  );
+                  console.log(contactIdentity, contactAttribs);
+                  hullApiCalls.push(
+                    hullClient.asUser(contactIdentity).traits(contactAttribs),
+                  );
+                });
+              }
+            } else {
+              // Import as user
+              const userIdent = mappingUtil.mapClientProspectToHullUserIdentity(
+                v,
+              );
+              const userAttribs = mappingUtil.mapToHullAttributes(
+                v,
+                "client",
+                undefined,
+                customFieldDefs,
+              );
+              console.log(userIdent, userAttribs);
+              hullApiCalls.push(
+                hullClient.asUser(userIdent).traits(userAttribs),
+              );
+            }
+            // Perform the API calls
+            await Promise.all(hullApiCalls);
+          }
+        }
+        break;
+      case "prospect":
+        if (
+          payload.notif.event === "created" ||
+          payload.notif.event === "updated"
+        ) {
+          const sellsyId = payload.notif.relatedid;
+
+          const clientDetailsResponse = await serviceClient.getProspect(
+            sellsyId,
+          );
+
+          if (clientDetailsResponse.success && clientDetailsResponse.data) {
+            // Remember the detail ain't be what we mapped, so we need to transform it first
+            const hullApiCalls: Promise<unknown>[] = [];
+            const v = MappingUtil.mapClientDetailToClient(
+              clientDetailsResponse.data.response,
+            );
+
+            if (v.type === "corporation") {
+              // Import as account
+              const acctIdent = mappingUtil.mapClientProspectToHullAccountIdentity(
+                v,
+              );
+              const acctAttribs = mappingUtil.mapToHullAttributes(
+                v,
+                "prospect",
+                undefined,
+                customFieldDefs,
+              );
+              console.log(acctIdent, acctAttribs);
+              hullApiCalls.push(
+                hullClient.asAccount(acctIdent).traits(acctAttribs),
+              );
+              if (v.contacts) {
+                forIn(v.contacts, (contact, contactId) => {
+                  const contactIdentity = mappingUtil.mapContactToHullUserIdentity(
+                    contact,
+                  );
+                  const contactAttribs = mappingUtil.mapToHullAttributes(
+                    contact,
+                    "contact",
+                    v.id,
+                    customFieldDefs,
+                  );
+                  console.log(contactIdentity, contactAttribs);
+                  hullApiCalls.push(
+                    hullClient.asUser(contactIdentity).traits(contactAttribs),
+                  );
+                });
+              }
+            } else {
+              // Import as user
+              const userIdent = mappingUtil.mapClientProspectToHullUserIdentity(
+                v,
+              );
+              const userAttribs = mappingUtil.mapToHullAttributes(
+                v,
+                "prospect",
+                undefined,
+                customFieldDefs,
+              );
+              console.log(userIdent, userAttribs);
+              hullApiCalls.push(
+                hullClient.asUser(userIdent).traits(userAttribs),
+              );
+            }
+            // Perform the API calls
+            await Promise.all(hullApiCalls);
+          } else {
+            console.error(clientDetailsResponse);
+          }
+        }
+        break;
+      case "contact":
+      case "people":
+        if (
+          payload.notif.event === "created" ||
+          payload.notif.event === "updated"
+        ) {
+          const sellsyId = payload.notif.relatedid;
+          const contactDetailResponse = await serviceClient.getContact(
+            sellsyId,
+          );
+          if (contactDetailResponse.success && contactDetailResponse.data) {
+            const v = MappingUtil.mapContactDetailToContact(
+              contactDetailResponse.data.response,
+            );
+            const hullApiCalls: Promise<unknown>[] = [];
+
+            // Import as user
+            const userIdent = mappingUtil.mapContactToHullUserIdentity(v);
+            const userAttribs = mappingUtil.mapToHullAttributes(
+              v,
+              "contact",
+              undefined,
+              customFieldDefs,
+            );
+            console.log(userIdent, userAttribs);
+            hullApiCalls.push(hullClient.asUser(userIdent).traits(userAttribs));
+            if ((v as any).linkedid && (v as any).linkedid !== "") {
+              hullApiCalls.push(
+                (hullClient.asUser(userIdent) as any).alias({
+                  anonymous_id: `sellsy-contact:${(v as any).linkedid}`,
+                }),
+              );
+            }
+
+            await Promise.all(hullApiCalls);
+          }
+        }
+        break;
+      default:
+        console.log(`Unsupported object type '${payload.notif.thirdtype}'`);
+        break;
+    }
     return Promise.resolve();
   }
 

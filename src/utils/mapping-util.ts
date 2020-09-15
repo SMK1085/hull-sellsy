@@ -13,6 +13,9 @@ import {
   SellsyClientCustomField,
   SELLSY_DEFAULTFIELDS_CLIENT,
   SELLSY_DEFAULTFIELDS_CONTACT,
+  SellsyClientProspectDetail,
+  SellsyContact,
+  SellsyContactDetailData,
 } from "../core/service-objects";
 import { IHullUserClaims } from "../types/user";
 const ATTRIBUTE_GROUP_PREFIX = "sellsy";
@@ -577,5 +580,167 @@ export class MappingUtil {
     }
 
     return castedValue;
+  }
+
+  public static mapClientDetailToClient(
+    detailData: SellsyClientProspectDetail,
+  ): SellsyClient {
+    const primaryAddress =
+      detailData.address.length === 0
+        ? undefined
+        : detailData.address.find((a) => a.isMain === "Y");
+    const deliveryAddress =
+      detailData.address.length === 0
+        ? undefined
+        : detailData.address.find((a) => a.isMainDeliv === "Y");
+    let mainContact: SellsyContact | undefined;
+    if (detailData.contacts) {
+      forIn(detailData.contacts, (v, k) => {
+        if (v.isMain === "Y") {
+          mainContact = v;
+        }
+      });
+    }
+    const customFieldsFlat: SellsyClientCustomField[] = [];
+    if (detailData.customFields) {
+      forIn(detailData.customFields, (v, k) => {
+        customFieldsFlat.push(...v.list);
+      });
+    }
+    const result: SellsyClient = {
+      accountingCode: detailData.client.accountingCode,
+      actif: detailData.client.actif,
+      addr_countrycode: primaryAddress ? primaryAddress.countrycode : "",
+      addr_countryname: primaryAddress ? primaryAddress.countryname : "",
+      addr_geocode: "",
+      addr_lat: primaryAddress ? primaryAddress.lat : "",
+      addr_lng: primaryAddress ? primaryAddress.lng : "",
+      addr_name: primaryAddress ? primaryAddress.name : "",
+      addr_part1: primaryAddress ? primaryAddress.part1 : "",
+      addr_part2: primaryAddress ? primaryAddress.part2 : "",
+      addr_state: primaryAddress ? primaryAddress.state : "",
+      addr_town: primaryAddress ? primaryAddress.town : "",
+      addr_zip: primaryAddress ? primaryAddress.zip : "",
+      apenaf: detailData.corporation ? detailData.corporation.apenaf : "",
+      auxCode: detailData.client.auxCode,
+      avatar: detailData.avatar,
+      capital: detailData.corporation ? detailData.corporation.capital : "",
+      contacts: detailData.contacts ? detailData.contacts : {},
+      corpType: detailData.corporation ? detailData.corporation.type : "",
+      corpid: detailData.client.corpid,
+      customfields: customFieldsFlat,
+      contactId: detailData.contact ? detailData.contact.id : "",
+      dateTransformProspect: detailData.client.transformationDate
+        ? detailData.client.transformationDate
+        : "",
+      delivAddress: deliveryAddress ? deliveryAddress.toHTML : "",
+      delivaddr_countrycode: deliveryAddress ? deliveryAddress.countrycode : "",
+      delivaddr_countryname: deliveryAddress ? deliveryAddress.countryname : "",
+      delivaddr_geocode: "",
+      delivaddr_lat: deliveryAddress ? deliveryAddress.lat : "",
+      delivaddr_lng: deliveryAddress ? deliveryAddress.lng : "",
+      delivaddr_name: deliveryAddress ? deliveryAddress.name : "",
+      delivaddr_part1: deliveryAddress ? deliveryAddress.part1 : "",
+      delivaddr_part2: deliveryAddress ? deliveryAddress.part2 : "",
+      delivaddr_state: deliveryAddress ? deliveryAddress.state : "",
+      delivaddr_town: deliveryAddress ? deliveryAddress.town : "",
+      delivaddr_zip: deliveryAddress ? deliveryAddress.zip : "",
+      email: get(
+        detailData,
+        "corporation.email",
+        get(detailData, "contact.email", ""),
+      ),
+      fax: get(
+        detailData,
+        "corporation.fax",
+        get(detailData, "contact.fax", ""),
+      ),
+      contactDetails: "",
+      formated_joindate: "",
+      formated_transformprospectdate: "",
+      formatted_fax: "",
+      formatted_mobile: "",
+      formatted_tel: "",
+      fullName: detailData.client.name,
+      id: detailData.client.id,
+      ident: "",
+      joindate: detailData.client.joindate,
+      lastactivity: detailData.client.lastactivity ?? "",
+      lastactivity_formatted: "",
+      logo: detailData.corporation ? detailData.corporation.logo : "",
+      mainAddress: primaryAddress ? primaryAddress.toHTML : "",
+      mainaddressid: primaryAddress ? primaryAddress.id : "",
+      mainContactName: mainContact ? mainContact.name : "",
+      maincontactid: mainContact ? mainContact.id : "",
+      maindelivaddressid: deliveryAddress ? deliveryAddress.id : "",
+      massmailingUnsubscribed: detailData.client.massmailingUnsubscribed,
+      massmailingUnsubscribedCustom:
+        detailData.client.massmailingUnsubscribedCustom,
+      massmailingUnsubscribedMail:
+        detailData.client.massmailingUnsubscribedMail,
+      massmailingUnsubscribedSMS: detailData.client.massmailingUnsubscribedSMS,
+      mobile: get(
+        detailData,
+        "corporation.mobile",
+        get(detailData, "contact.mobile", ""),
+      ),
+      name: detailData.client.name,
+      owner: "",
+      ownerid: detailData.client.ownerid,
+      people_civil: detailData.contact ? detailData.contact.civil : "",
+      people_forename: detailData.contact ? detailData.contact.forename : "",
+      people_name: detailData.contact ? detailData.contact.name : "",
+      phoningUnsubscribed: detailData.client.phoningUnsubscribed,
+      pic: "",
+      rateCategory: detailData.client.rateCategory,
+      rcs: detailData.corporation ? detailData.corporation.rcs : "",
+      relationType: detailData.client.relationType,
+      score: detailData.score.value,
+      scoreClass: "",
+      scoreFormatted: detailData.score.formatted,
+      siren: detailData.corporation ? detailData.corporation.siren : "",
+      siret: detailData.corporation ? detailData.corporation.siret : "",
+      smartTags: detailData.smartTags ? detailData.smartTags : {},
+      stickyNote: detailData.client.stickyNote,
+      tel: get(
+        detailData,
+        "corporation.tel",
+        get(detailData, "contact.tel", ""),
+      ),
+      thirdid: detailData.client.detailsid,
+      type: detailData.client.type,
+      vat: detailData.corporation ? detailData.corporation.vat : "",
+      web: get(
+        detailData,
+        "corporation.web",
+        get(detailData, "contact.web", ""),
+      ),
+      webUrl: get(
+        detailData,
+        "corporation.web",
+        get(detailData, "contact.web", ""),
+      ),
+    };
+    return result;
+  }
+
+  public static mapContactDetailToContact(
+    detailData: SellsyContactDetailData,
+  ): SellsyContact {
+    const customFieldsFlat: SellsyClientCustomField[] = [];
+    if (detailData.customFields) {
+      forIn(detailData.customFields, (v, k) => {
+        customFieldsFlat.push(...v.list);
+      });
+    }
+    const result: SellsyContact = {
+      ...detailData,
+      customfields: customFieldsFlat,
+      isMain: "",
+      thirdid: detailData.id,
+      peopleid: detailData.id,
+    };
+
+    return result;
   }
 }

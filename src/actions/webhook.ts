@@ -1,4 +1,4 @@
-import { Request, Response, RequestHandler } from "express";
+import { Request, Response, RequestHandler, json } from "express";
 import { AwilixContainer } from "awilix";
 import { Logger } from "winston";
 import { cloneDeep } from "lodash";
@@ -16,7 +16,9 @@ export const webhookActionFactory = (): RequestHandler => {
       correlationKey = scope.resolve<string>("correlationKey");
       const syncAgent = new SyncAgent(scope);
       res.json({ ok: true });
-      await syncAgent.handleWebhook(req.body as SellsyWebhookRequest);
+      const parsedBody =
+        typeof req.body === "string" ? JSON.parse(req.body) : req.body;
+      await syncAgent.handleWebhook(parsedBody as SellsyWebhookRequest);
       return Promise.resolve(true);
     } catch (error) {
       console.error(error);

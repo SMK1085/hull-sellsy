@@ -11,6 +11,8 @@ import {
   SellsyCustomFieldGroup,
   SellsyCustomField,
   SellsyContact,
+  SellsyClientProspectDetail,
+  SellsyContactDetailData,
 } from "./service-objects";
 import { ApiUtil } from "../utils/api-util";
 import { OAuth } from "oauth";
@@ -88,6 +90,53 @@ export class ServiceClient {
     }
   }
 
+  public async getClient(
+    id: string,
+  ): Promise<
+    ApiResultObject<any, SellsyResponse<SellsyClientProspectDetail>, Error>
+  > {
+    const method = "Client.getOne";
+    const params = {
+      clientid: id,
+    };
+    const postData = {
+      request: 1,
+      io_mode: "json",
+      do_in: JSON.stringify({
+        method,
+        params,
+      }),
+    };
+
+    try {
+      const result = await this.execute<
+        SellsyResponse<SellsyClientProspectDetail>
+      >(method, params);
+      if (result.status !== "success") {
+        return ApiUtil.handleApiResultError(
+          `${DEFAULT_ENDPOINT}/`,
+          "post",
+          postData,
+          new Error(result.error),
+        );
+      }
+
+      return ApiUtil.handleApiResultSuccess(
+        `${DEFAULT_ENDPOINT}/`,
+        "post",
+        postData,
+        result,
+      );
+    } catch (error) {
+      return ApiUtil.handleApiResultError(
+        `${DEFAULT_ENDPOINT}/`,
+        "post",
+        postData,
+        error,
+      );
+    }
+  }
+
   public async getProspects(
     pagination: SellsyPaginationRequest = { nbperpage: 50, pagenum: 1 },
   ): Promise<
@@ -139,6 +188,53 @@ export class ServiceClient {
     }
   }
 
+  public async getProspect(
+    id: string,
+  ): Promise<
+    ApiResultObject<any, SellsyResponse<SellsyClientProspectDetail>, Error>
+  > {
+    const method = "Prospects.getOne";
+    const params = {
+      id,
+    };
+    const postData = {
+      request: 1,
+      io_mode: "json",
+      do_in: JSON.stringify({
+        method,
+        params,
+      }),
+    };
+
+    try {
+      const result = await this.execute<
+        SellsyResponse<SellsyClientProspectDetail>
+      >(method, params);
+      if (result.status !== "success") {
+        return ApiUtil.handleApiResultError(
+          `${DEFAULT_ENDPOINT}/`,
+          "post",
+          postData,
+          new Error(result.error),
+        );
+      }
+
+      return ApiUtil.handleApiResultSuccess(
+        `${DEFAULT_ENDPOINT}/`,
+        "post",
+        postData,
+        result,
+      );
+    } catch (error) {
+      return ApiUtil.handleApiResultError(
+        `${DEFAULT_ENDPOINT}/`,
+        "post",
+        postData,
+        error,
+      );
+    }
+  }
+
   public async getContacts(
     pagination: SellsyPaginationRequest = { nbperpage: 50, pagenum: 1 },
   ): Promise<
@@ -164,6 +260,53 @@ export class ServiceClient {
     try {
       const result = await this.execute<
         SellsyResponse<SellsyResponseListData<SellsyContact>>
+      >(method, params);
+      if (result.status !== "success") {
+        return ApiUtil.handleApiResultError(
+          `${DEFAULT_ENDPOINT}/`,
+          "post",
+          postData,
+          new Error(result.error),
+        );
+      }
+
+      return ApiUtil.handleApiResultSuccess(
+        `${DEFAULT_ENDPOINT}/`,
+        "post",
+        postData,
+        result,
+      );
+    } catch (error) {
+      return ApiUtil.handleApiResultError(
+        `${DEFAULT_ENDPOINT}/`,
+        "post",
+        postData,
+        error,
+      );
+    }
+  }
+
+  public async getContact(
+    id: string,
+  ): Promise<
+    ApiResultObject<any, SellsyResponse<SellsyContactDetailData>, Error>
+  > {
+    const method = "Peoples.getOne";
+    const params = {
+      id,
+    };
+    const postData = {
+      request: 1,
+      io_mode: "json",
+      do_in: JSON.stringify({
+        method,
+        params,
+      }),
+    };
+
+    try {
+      const result = await this.execute<
+        SellsyResponse<SellsyContactDetailData>
       >(method, params);
       if (result.status !== "success") {
         return ApiUtil.handleApiResultError(

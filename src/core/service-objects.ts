@@ -295,6 +295,7 @@ export interface SellsyContact extends SellsyContactBase {
   smartTags?: {
     [key: string]: SellsySmartTagBase;
   };
+  isMain: string;
 }
 
 export interface SellsyProspect {
@@ -1679,4 +1680,233 @@ export interface SellsyWebhookRequest {
     ownertype: string;
     corpid: string;
   };
+}
+
+export interface SellsyClientProspectDetail {
+  client: SellsyClientDetailClientData;
+  corporation?: SellsyCorporationData;
+  contact?: SellsyContactData;
+  contacts?: {
+    [key: string]: SellsyContact;
+  };
+  address: SellsyAddress[];
+  smartTags?: {
+    [key: string]: SellsySmartTagBase;
+  };
+  tags?: {
+    [key: string]: SellsySmartTagBase;
+  };
+  customFields?: {
+    [key: string]: {
+      list: SellsyClientCustomField[];
+    };
+  };
+  avatar: {
+    type: string;
+    value: string;
+    class: number;
+  };
+  score: {
+    value: string;
+    formatted: string;
+  };
+}
+
+export interface SellsyClientDetailClientData {
+  id: string;
+  detailsid: string; // corporation.id
+  corpid: string; // sellsy account id
+  ownerid: string; // staff id
+  joindate: string; // SQL Date
+  type: string;
+  relationType: string;
+  status: string;
+  actif: string; // boolean
+  maincontactid: string;
+  ident: string;
+  accountingCode: string;
+  accountingPurchaseCode: string;
+  auxCode: string;
+  stickyNote: string;
+  twitter: string;
+  facebook: string;
+  linkedin: string;
+  viadeo: string;
+  rateCategory: string;
+  wasProspect: string; // boolean
+  source: string;
+  originid: string | null;
+  originType: string;
+  tenLastType: string;
+  massmailingUnsubscribed: string;
+  massmailingUnsubscribedSMS: string;
+  phoningUnsubscribed: string;
+  massmailingUnsubscribedMail: string;
+  massmailingUnsubscribedCustom: string;
+  firmsearchurl: string;
+  lang: string;
+  lastactivity: string | null;
+  business_segment: string | null;
+  number_of_employees: string | null;
+  name: string;
+  web: string;
+  formatted_joindate: string;
+  transformationDate: string | null;
+}
+
+export interface SellsyContactData {
+  id: string;
+  corpid: string;
+  ownerid: string;
+  linkedtype: string;
+  linkedid: string;
+  status: string;
+  rank: string;
+  gender: string;
+  civil: string;
+  forename: string;
+  name: string;
+  email: string;
+  web: string;
+  tel: string;
+  mobile: string;
+  fax: string;
+  position: string;
+  pic: string;
+  sign: string;
+  birthdate: string;
+  twitter: string;
+  linkedin: string;
+  facebook: string;
+  viadeo: string;
+  stickyNote: string;
+  mainAddressID: string;
+  mainDelivAddressID: string;
+  mailchimp: string;
+  mailjet: string;
+  simplemail: string;
+  massmailingUnsubscribed: string;
+  massmailingUnsubscribedSMS: string;
+  phoningUnsubscribed: string;
+  massmailingUnsubscribedMail: string;
+  massmailingUnsubscribedCustom: string;
+  langid: string;
+  lang: string;
+  actif: string;
+  created: string;
+  lastUpdate: string;
+  fullName: string;
+  formatted_tel: string;
+  formatted_mobile: string;
+  formatted_fax: string;
+  mcoptin: string;
+  mjoptin: string;
+  smoptin: string;
+}
+export interface SellsyCorporationData {
+  id: string;
+  linkedtype: string;
+  linkedid: string;
+  prefsid: string;
+  accountingPrefsId: string;
+  logo: string;
+  name: string;
+  email: string;
+  web: string;
+  tel: string;
+  mobile: string;
+  fax: string;
+  siret: string;
+  vat: string;
+  apenaf: string;
+  rcs: string;
+  type: string;
+  capital: string;
+  mainaddressid: string;
+  maindelivaddressid: string;
+  siren: string;
+  formatted_tel: string;
+  formatted_mobile: string;
+  formatted_fax: string;
+}
+
+export interface SellsyAddress {
+  status: string;
+  rank: string;
+  name: string;
+  part1: string;
+  part2: string;
+  part3: string;
+  part4: string;
+  zip: string;
+  town: string;
+  state: string;
+  countrycode: string;
+  originalid: string;
+  lat: string;
+  lng: string;
+  id: string;
+  isMain: string;
+  isMainDeliv: string;
+  countryname: string;
+  toHTML: string;
+}
+
+export interface SellsyContactDetailData {
+  id: string;
+  corpid: string;
+  ownerid: string;
+  linkedtype: string;
+  linkedid: string;
+  status: string;
+  rank: string;
+  gender: string;
+  civil: string;
+  forename: string;
+  name: string;
+  email: string;
+  web: string;
+  tel: string;
+  mobile: string;
+  fax: string;
+  position: string;
+  pic: string;
+  sign: string;
+  birthdate: string;
+  twitter: string;
+  linkedin: string;
+  facebook: string;
+  viadeo: string;
+  stickyNote: string;
+  mainAddressID: string;
+  mainDelivAddressID: string;
+  mailchimp: string;
+  mailjet: string;
+  simplemail: string;
+  massmailingUnsubscribed: string;
+  massmailingUnsubscribedSMS: string;
+  phoningUnsubscribed: string;
+  massmailingUnsubscribedMail: string;
+  massmailingUnsubscribedCustom: string;
+  langid: string;
+  lang: string;
+  actif: string;
+  created: string;
+  lastUpdate: string;
+  fullName: string;
+  avatar: {
+    type: string;
+    value: string;
+    class: number;
+  };
+  formatted_birthdate: string;
+  tags: [];
+  customFields?: {
+    [key: string]: {
+      list: SellsyClientCustomField[];
+    };
+  };
+  formatted_tel: string;
+  formatted_mobile: string;
+  formatted_fax: string;
 }

@@ -1666,6 +1666,41 @@ export const SELLSY_DEFAULTFIELDS_CONTACT: SellsyFieldDefinition[] = [
     readonly: true,
     isDefault: true,
   },
+  {
+    code: "massmailingUnsubscribed",
+    label: "Unsubscribe to email campaigns",
+    type: "boolean",
+    readonly: false,
+    isDefault: true,
+  },
+  {
+    code: "massmailingUnsubscribedSMS",
+    label: "Unsubscribe to SMS campaigns",
+    type: "boolean",
+    readonly: false,
+    isDefault: true,
+  },
+  {
+    code: "phoningUnsubscribed",
+    label: "Unsubscribe to phone campaigns",
+    type: "boolean",
+    readonly: false,
+    isDefault: true,
+  },
+  {
+    code: "massmailingUnsubscribedMail",
+    label: "Unsubscribe to postal campaigns",
+    type: "boolean",
+    readonly: false,
+    isDefault: true,
+  },
+  {
+    code: "massmailingUnsubscribedCustom",
+    label: "Unsubscribe to personalized marketing campaigns",
+    type: "boolean",
+    readonly: false,
+    isDefault: true,
+  },
 ];
 
 export interface SellsyWebhookRequest {

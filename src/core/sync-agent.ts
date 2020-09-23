@@ -427,7 +427,12 @@ export class SyncAgent {
               hullApiCalls.push(
                 hullClient.asUser(userIdent).traits(userAttribs),
               );
-              if ((v as any).linkedid && (v as any).linkedid !== "") {
+              if (
+                (v as any).linkedid &&
+                (v as any).linkedid !== "" &&
+                (v as any).linkedid !== 0 &&
+                (v as any).linkedid !== "0"
+              ) {
                 hullApiCalls.push(
                   (hullClient.asUser(userIdent) as any).alias({
                     anonymous_id: `sellsy-contact:${(v as any).linkedid}`,

@@ -410,18 +410,22 @@ export class MappingUtil {
     clientId?: string,
   ): { [key: string]: HullAttribute } {
     const result = {};
-
+    // console.log(data);
     forEach(this.appSettings.mapping_in_contact, (mapping) => {
       if (!isNil(mapping.hull) && !isNil(mapping.service)) {
         if (
           mapping.service.startsWith("$customfield") === true &&
           data.customfields
         ) {
-          const customField = data.customfields.find(
-            (cf: SellsyFieldDefinition) =>
-              cf.code ===
-              (mapping.service as string).replace("$customfield.", ""),
-          );
+          let customField;
+
+          forIn(data.customfields, (v, k) => {
+            if (v.code === mapping.service?.replace("$customfield.", "")) {
+              customField = v;
+              return false;
+            }
+          });
+
           if (customField) {
             const fieldDefCf = this.customFieldDefs?.find(
               (fd) => fd.code === mapping.service?.replace("$customfield.", ""),
